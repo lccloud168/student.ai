@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>學員AI分享牆｜聯成電腦</title>
+<meta name="description" content="聯成電腦學員運用生成式 AI 完成的影像與影片作品。">
+<meta property="og:title" content="學員AI分享牆｜聯成電腦">
+<meta property="og:description" content="聯成電腦學員運用生成式 AI 完成的影像與影片作品。">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EAEC;
+  --surface:#FFFFFF;
+  --ink:#16171A;
+  --muted:#6B6F76;
+  --line:rgba(22,23,26,.13);
+  --accent:#E8481C;
+  --sans:"Noto Sans TC",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei",sans-serif;
+  --serif:"Noto Serif TC","Songti TC",serif;
+  --pad:clamp(20px,5vw,64px);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+/* ---------- header ---------- */
+.masthead{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;gap:14px;
+  padding:14px var(--pad);
+  background:rgba(233,234,236,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.mark{
+  display:flex;align-items:baseline;gap:9px;
+  font-weight:700;letter-spacing:.02em;text-decoration:none;color:inherit;
+}
+.mark b{font-size:17px}
+.mark span{font-size:13px;color:var(--muted);font-weight:400}
+.mark i{
+  width:9px;height:9px;background:var(--accent);border-radius:50%;
+  display:inline-block;font-style:normal;transform:translateY(-1px)
+}
+
+/* ---------- hero ---------- */
+.hero{
+  padding:clamp(44px,7vw,84px) var(--pad) clamp(30px,4vw,48px);
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  gap:clamp(24px,4vw,56px);align-items:center;
+}
+.hero h1{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(38px,6.6vw,74px);line-height:1.14;
+  margin:0 0 20px;letter-spacing:.01em;
+}
+.hero p{margin:0;max-width:34em;color:#33363C;font-size:clamp(15px,1.6vw,17px)}
+.tally{
+  margin-top:26px;padding-top:18px;border-top:2px solid var(--ink);
+  display:inline-flex;flex-wrap:wrap;gap:6px 22px;font-size:14px;color:var(--muted)
+}
+.tally b{color:var(--ink);font-weight:700}
+
+/* pinned prints */
+.wall{position:relative;height:clamp(220px,30vw,330px)}
+.wall figure{
+  position:absolute;margin:0;width:46%;
+  background:var(--surface);padding:9px 9px 34px;
+  border:1px solid var(--line);
+  box-shadow:0 14px 28px -18px rgba(0,0,0,.5);
+}
+.wall figure:nth-child(1){left:0;top:8%;transform:rotate(-4.5deg)}
+.wall figure:nth-child(2){left:27%;top:0;transform:rotate(1.5deg);z-index:2}
+.wall figure:nth-child(3){right:0;top:14%;transform:rotate(5deg)}
+.wall .slot{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:#D6D7DA}
+.wall .slot>*{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity 1.3s ease
+}
+.wall .slot>.live{opacity:1}
+.wall figcaption{
+  position:absolute;left:9px;right:9px;bottom:9px;
+  font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  padding-top:6px;transition:opacity .35s ease
+}
+.pin{
+  position:absolute;top:-7px;left:50%;width:12px;height:12px;margin-left:-6px;
+  background:var(--accent);border-radius:50%;
+  box-shadow:0 2px 4px rgba(0,0,0,.35)
+}
+
+/* ---------- filters ---------- */
+.filters{
+  padding:6px var(--pad) 26px;
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+}
+.chip{
+  background:transparent;border:1px solid var(--line);border-radius:100px;
+  padding:7px 16px;font-size:14px;transition:background .15s,border-color .15s,color .15s;
+}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip small{opacity:.6;margin-left:6px;font-size:12px}
+
+/* ---------- grid ---------- */
+.grid{
+  padding:0 var(--pad) 90px;
+  display:grid;gap:clamp(16px,2.2vw,28px);
+  grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+}
+.card{
+  background:var(--surface);border:1px solid var(--line);
+  text-align:left;padding:0;overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.card:hover,.card:focus-visible{transform:translateY(-3px);box-shadow:0 18px 34px -22px rgba(0,0,0,.55)}
+.thumb{position:relative;aspect-ratio:4/3;overflow:hidden;background:#DDDEE1}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.badge{
+  position:absolute;left:10px;top:10px;
+  background:rgba(22,23,26,.82);color:#fff;
+  font-size:11.5px;padding:4px 9px;border-radius:3px;letter-spacing:.03em
+}
+.play{
+  position:absolute;right:10px;bottom:10px;
+  display:flex;align-items:center;gap:5px;
+  background:var(--accent);color:#fff;font-size:12px;padding:5px 11px;border-radius:100px;
+  cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;
+  box-shadow:0 2px 8px -2px rgba(0,0,0,.5)
+}
+.play:hover{transform:scale(1.07);box-shadow:0 4px 12px -2px rgba(0,0,0,.6)}
+.card-body{padding:15px 16px 18px;flex:1;display:flex;flex-direction:column;gap:5px}
+.card-body h3{
+  font-family:var(--serif);font-size:19px;font-weight:600;margin:0;line-height:1.4
+}
+.card-body .who{font-size:13.5px;color:var(--muted)}
+.card-body .who b{color:var(--ink);font-weight:500}
+.card-body .snip{
+  font-size:13.5px;color:var(--muted);margin:4px 0 0;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden
+}
+.empty{
+  grid-column:1/-1;padding:70px 0;text-align:center;color:var(--muted)
+}
+.empty b{display:block;color:var(--ink);font-size:19px;font-family:var(--serif);margin-bottom:8px}
+
+/* placeholder art */
+.ph{
+  width:100%;height:100%;display:grid;place-items:center;text-align:center;
+  padding:16px;font-size:13px;color:rgba(255,255,255,.94);line-height:1.5;
+  font-family:var(--serif);word-break:break-word
+}
+
+/* ---------- detail overlay ---------- */
+.veil{
+  position:fixed;inset:0;z-index:60;background:rgba(14,15,17,.94);
+  display:none;grid-template-columns:minmax(0,1fr) minmax(300px,352px);
+}
+.veil.on{display:grid}
+body.locked{overflow:hidden}
+.stage{
+  position:relative;display:grid;place-items:center;padding:48px 14px 68px;min-width:0;
+}
+.stage .shot{max-width:100%;max-height:100%;object-fit:contain}
+.stage .ph{max-width:520px;aspect-ratio:4/3;height:auto}
+.stage .tube,.stage .shot-video{
+  width:100%;max-width:calc((100vh - 128px) * 16 / 9);
+  aspect-ratio:16/9;background:#000;border:0
+}
+.stage .tube{cursor:pointer}
+.strip button{position:relative}
+.vmark{
+  position:absolute;inset:0;display:grid;place-items:center;
+  background:rgba(0,0,0,.45);color:#fff;font-size:13px
+}
+.nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:46px;height:46px;border-radius:50%;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25);color:#fff;
+  display:grid;place-items:center;font-size:20px;line-height:1;
+  transition:background .15s
+}
+.nav:hover{background:rgba(255,255,255,.3)}
+.nav[disabled]{opacity:.22;cursor:default}
+.nav.prev{left:14px}
+.nav.next{right:14px}
+.counter{
+  position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+  color:rgba(255,255,255,.72);font-size:13px;letter-spacing:.06em
+}
+.strip{
+  position:absolute;bottom:56px;left:50%;transform:translateX(-50%);
+  display:flex;gap:7px
+}
+.strip button{
+  width:44px;height:34px;padding:0;border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);overflow:hidden;opacity:.5;transition:opacity .15s
+}
+.strip button[aria-current="true"]{opacity:1;border-color:#fff}
+.strip img{width:100%;height:100%;object-fit:cover}
+.strip .ph{font-size:0}
+
+.panel{
+  background:#141517;color:#EDEEF0;overflow-y:auto;padding:56px 34px 44px;
+  border-left:1px solid rgba(255,255,255,.1)
+}
+.panel .tag{
+  display:inline-block;font-size:12px;color:#fff;background:var(--accent);
+  padding:3px 10px;border-radius:3px;margin-bottom:14px
+}
+.panel h2{font-family:var(--serif);font-size:27px;line-height:1.35;margin:0 0 6px;font-weight:600}
+.panel .who{color:#9DA2AA;font-size:14px;margin:0 0 22px}
+.panel .who b{color:#fff;font-weight:500}
+.panel .desc{font-size:14.5px;line-height:1.85;color:#C9CCD2;white-space:pre-wrap;margin:0}
+.panel h4{
+  font-size:13px;color:#9DA2AA;font-weight:500;margin:30px 0 10px;
+  padding-top:18px;border-top:1px solid rgba(255,255,255,.12)
+}
+.tube{
+  position:relative;aspect-ratio:16/9;background:#000;overflow:hidden;
+  display:grid;place-items:center;width:100%;border:0;padding:0
+}
+.tube img{width:100%;height:100%;object-fit:cover;opacity:.75}
+.tube iframe{width:100%;height:100%;border:0}
+.tube .btn{
+  position:absolute;display:flex;align-items:center;gap:8px;
+  background:var(--accent);color:#fff;padding:9px 18px;border-radius:100px;font-size:14px
+}
+.solo{
+  position:absolute;top:12px;left:14px;z-index:2;
+  display:flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25);color:#fff;
+  padding:7px 15px;border-radius:100px;font-size:13px;transition:background .15s
+}
+.solo:hover{background:rgba(255,255,255,.3)}
+.veil.focusmode{grid-template-columns:1fr}
+.veil.focusmode .panel{display:none}
+.veil.focusmode .stage .tube,.veil.focusmode .stage .shot-video{
+  max-width:min(1400px, calc((100vh - 128px) * 16 / 9))
+}
+.shut{
+  position:fixed;top:14px;right:16px;z-index:70;
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25);color:#fff;
+  font-size:19px;line-height:1;display:none;place-items:center
+}
+.veil.on ~ .shut{display:grid}
+
+/* ---------- footer ---------- */
+footer{
+  padding:34px var(--pad) 60px;border-top:1px solid var(--line);
+  font-size:13.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 26px
+}
+footer a{color:var(--ink)}
+
+/* ---------- admin ---------- */
+#admin{display:none;padding:34px var(--pad) 70px;border-top:2px solid var(--ink);background:#DFE0E3}
+#admin.on{display:block}
+#admin h2{font-family:var(--serif);font-size:24px;margin:0 0 6px}
+#admin>p{margin:0 0 22px;color:var(--muted);font-size:14px;max-width:52em}
+.form{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));max-width:1000px}
+.form label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted)}
+.form .wide{grid-column:1/-1}
+.form input,.form textarea,.form select{
+  font:inherit;font-size:14.5px;color:var(--ink);
+  padding:9px 11px;border:1px solid var(--line);background:#fff;border-radius:3px
+}
+.form textarea{min-height:96px;resize:vertical;line-height:1.7}
+.gen{
+  margin-top:18px;background:var(--ink);color:#fff;border:0;
+  padding:11px 24px;border-radius:100px;font-size:14.5px
+}
+#out{
+  margin-top:18px;display:none;background:#141517;color:#D8DBE0;
+  padding:18px;border-radius:4px;font-size:13px;line-height:1.7;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  white-space:pre;overflow-x:auto;max-width:1000px
+}
+#out.on{display:block}
+
+/* ---------- responsive ---------- */
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr}
+  .wall{order:-1;height:250px}
+  .veil.on{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}
+  .stage{padding:52px 10px 64px;min-height:46vh}
+  .stage .tube,.stage .shot-video{max-width:100%}
+  .panel{padding:24px 20px 36px;border-left:0;border-top:1px solid rgba(255,255,255,.1);max-height:44vh}
+  .strip{display:none}
+  .nav{width:40px;height:40px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  .wall .slot>*{opacity:0}
+  .wall .slot>.live{opacity:1}
+  .card:hover{transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <a class="mark" href="./"><i></i><b>聯成電腦</b><span>學員AI分享牆</span></a>
+</header>
+
+<section class="hero">
+  <div>
+    <h1>學員AI分享牆</h1>
+    <p>這裡收錄聯成電腦學員運用生成式 AI 完成的影像與影片。點開任一件，可以逐張瀏覽，也可以直接播放影片。</p>
+    <div class="tally" id="tally"></div>
+  </div>
+  <div class="wall" id="wall"></div>
+</section>
+
+<div class="filters" id="filters"></div>
+
+<main class="grid" id="grid"></main>
+
+<section id="admin">
+  <h2>新增作品</h2>
+  <p>填完按「產生程式碼」，把下方那段複製起來，貼到 index.html 裡 <code>作品資料</code> 清單的最前面（第一個 <code>{</code> 之前），存檔後重新上傳即可。這個面板只有網址加上 #edit 時才會出現，一般訪客看不到。</p>
+  <div class="form">
+    <label class="wide">作品名稱<input id="f-title" placeholder="拾墨文創 品牌商標設計"></label>
+    <label>學員姓名<input id="f-name" placeholder="張文欣"></label>
+    <label>課程名稱<input id="f-course" placeholder="平面設計"></label>
+    <label>年份<input id="f-year" placeholder="2026"></label>
+    <label class="wide">YouTube 影片網址，一行一支<textarea id="f-video" placeholder="https://youtu.be/xxxxxxxxxxx&#10;沒有影片就整格留空"></textarea></label>
+    <label class="wide">作品說明<textarea id="f-desc" placeholder="使用的工具、提示詞方向、想呈現的效果⋯⋯（可留空）"></textarea></label>
+    <label class="wide">圖片檔名，一行一張<textarea id="f-imgs" placeholder="images/shimo-01.jpg&#10;images/shimo-02.jpg"></textarea></label>
+  </div>
+  <button class="gen" id="gen">產生程式碼</button>
+  <pre id="out"></pre>
+</section>
+
+<footer>
+  <span>聯成電腦　學員AI分享牆</span>
+  <span>作品著作權屬於各學員本人</span>
+</footer>
+
+<div class="veil" id="veil" role="dialog" aria-modal="true" aria-label="作品詳細內容">
+  <div class="stage">
+    <button class="solo" id="solo">⤢ 收合文案</button>
+    <div id="shot-slot"></div>
+    <button class="nav prev" id="prev" aria-label="上一張">‹</button>
+    <button class="nav next" id="next" aria-label="下一張">›</button>
+    <div class="strip" id="strip"></div>
+    <div class="counter" id="counter"></div>
+  </div>
+  <aside class="panel" id="panel"></aside>
+</div>
+<button class="shut" id="shut" aria-label="關閉">✕</button>
+
+<script>
+/* ==========================================================================
+   作品資料　—　要新增作品，就在下面照樣複製一組 { ... } 貼上去
+   最上面的會顯示在最前面。網址加上 #edit 可以打開表單自動產生格式。
+   ========================================================================== */
+
+const 作品資料 = [
+  {
+    作品: "海",
+    學員: "李O良",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "Gemini生成。一本攤開在木桌上的立體書：書頁化成翻湧的海面，紙做的雲和海鷗浮在空中，兩座長滿綠意的小島從頁面隆起，燈塔亮著燈，帆船正要駛離。一對背著背包的旅人站在書緣望向海。",
+    影片: ["z6GUcGH4btk"],
+    圖片: ["images/01.jpg"]
+  },
+  {
+    作品: "時尚接拍服飾替換",
+    學員: "廖O彭",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "模特兒站在深色針葉林前，逆光在紅髮邊緣鑲出一圈金光，身上是米色亞麻排釦洋裝，手上換成一只深灰皮革菱格紋手提包。",
+    影片: [],
+    圖片: ["images/02.jpg"]
+  },
+  {
+    作品: "日夜縮時花園",
+    學員: "陳O羽",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "讓同一座花園在畫面中從白天走到夜晚。重點在於場景結構維持不變，只讓光線、色溫與陰影隨時間推移，做出縮時攝影的效果。",
+    影片: ["i9r6ueaC4gI"],
+    圖片: ["images/03.jpg"]
+  },
+ {
+    作品: "City intersection",
+    學員: "黃O婷",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "城市十字路口的動態生成短片。以人車流動為主角，練習在同一鏡位下處理多重移動物件，讓交通的節奏自然而不雜亂。",
+    影片: ["SNNcH_2nBzY"],
+    圖片: ["images/04.jpg"]
+  },
+  {
+    作品: "台中景色",
+    學員: "王O瑜",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "以台中的城市景觀為題生成的短片。從在地熟悉的街廓與天際線出發，測試 AI 對本地場景的理解與重現程度。",
+    影片: ["QbhTW8nDyv4"],
+    圖片: ["images/05.jpg"]
+  },
+{
+    作品: "Roller coaster riding through city",
+    學員: "林O珠",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "第一人稱視角的雲霄飛車穿越城市。挑戰高速運鏡下的畫面穩定與空間連續性，是動態生成中難度較高的鏡頭語言。",
+    影片: ["nQUuySJ2yoY"],
+    圖片: ["images/06.jpg"]
+  },
+ {
+    作品: "Woman walking in rain",
+    學員: "郭O絴",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "雨中行走的人物短片。重點落在雨絲、地面反光與濕潤的空氣感，練習用提示詞層層堆疊出有情緒的氛圍。",
+    影片: ["atRtZl2E3aY"],
+    圖片: ["images/07.jpg"]
+  },
+  {
+    作品: "Family preparing food and fire",
+    學員: "林O淦",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "吉卜力味十足的冬夜廚房：老奶奶在水槽邊洗菜，老爺爺彎腰看著黃金獵犬和虎斑貓在地上扭打，柴爐燒得正旺，母雞帶著一窩小雞在乾草堆旁踱步，窗外正在下雪。",
+    影片: ["tWSWf2163ZI"],
+    圖片: ["images/08.jpg"]
+  },
+ {
+    作品: "台北街景",
+    學員: "游O雄",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "ChatGpt生成圖片，白天的台北信義區街景，台北101高聳於城市天際線中央，晴朗藍天與自然日光。寬闊的十字路口車水馬龍，大量汽車、黃色計程車、公車與機車持續穿梭，車流密集但自然有秩序。斑馬線上有上班族與行人往來，周圍是現代化商辦大樓、百貨公司、道路號誌與台灣街道招牌，路旁種植綠色行道樹。整體呈現繁忙、有活力的台北都會日常，超寫實攝影風格，真實自然光影，高細節，電影感，4K。",
+    影片: [],
+    圖片: ["images/09.jpg","images/10.jpg"]
+  },
+  {
+    作品: "老虎跑步",
+    學員: "簡O誼",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "提示詞:6 秒短影片，一隻 Q 版可愛小老虎，全身比例圓潤、眼睛大而閃亮。\n場景是明亮的童話森林草地，色彩柔和、卡通風。\n前面小老虎開心地小跑步，尾巴左右擺動，動作輕快。\n中間突然停下來，抬頭眨眼、露出燦爛笑容，耳朵微微抖動。\n最後小老虎跳一下並揮爪揮手，開心歡呼，畫面充滿童趣與活力。",
+    影片: ["ikhGZ0baGvo"],
+    圖片: ["images/11.jpg"]
+  },
+   {
+    作品: "電競耳機行銷",
+    學員: "涂O勻",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "🎧 行銷主軸\no 打造沉浸式遊戲體驗，兼具降噪、高音質、時尚外型，滿足玩家對性能與美感的雙重需求。\n✨ 產品亮點\no 🔇 主動降噪：隔絕環境干擾，專注每場戰局。\no 🎵 Hi-Fi 高音質：清晰定位腳步聲與環境音，提升遊戲勝率。\no 😎 時尚設計：流線外型搭配潮流配色，展現個人風格。\n 🎯 目標客群\no 電競玩家、直播主、學生族群、3C 愛好者。\n 📢 行銷策略\no FB／IG 短影音展示降噪與音效差異。\no 結合 KOL、實況主開箱，提升產品信任感。\no 限時優惠＋免運活動，刺激立即下單。\n 🚀 核心訴求\no 「聽見勝利、戴出風格！」 用極致音效與時尚設計，讓每一場對戰都更精彩。",
+    影片: [],
+    圖片: ["images/12.jpg"]
+  },
+  {
+    作品: "華生智能眼鏡",
+    學員: "林O翔",
+    課程: "生成式AI辦公室應用",
+    年份: "2026",
+    說明: "WATSON 智能眼鏡的產品形象橫幅，主標打「科技始終於人性」。中央是放在展示台上的眼鏡本體，上方弧線排開 AI 助手、第一視角拍攝、即時翻譯、智慧導航、語音操控五項功能，左下角以配戴情境搭配即時顯示的天氣與行程，底部再補上四項規格。",
+    影片: [],
+    圖片: ["images/13.jpg"]
+  },
+  {
+    作品: "城市守護者",
+    學員: "蘇O雯",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "一身金色鎧甲的女戰士站在跨海大橋邊，指尖舉起一枚正在成形的光輪，身後烏雲翻湧、陽光從縫隙灑落；橋的另一頭，一隻黑色巨獸正低吼著逼近。城市天際線就在遠方——把英雄片的對峙時刻放進了現代都會裡。",
+    影片: ["pAgDb9XwBn8"],
+    圖片: ["images/14.jpg"]
+  },
+ {
+    作品: "魔法師",
+    學員: "傅O菱",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "動漫風的魔女站在古老圖書館中，寬邊尖帽壓著銀灰長髮，一雙異色瞳（紫／金）直視前方，雙手捧著封著星系的水晶球，周圍漂浮著紫色符文圈與懷錶，窗外是月下的城堡尖塔。",
+    影片: ["xQzlxG4n9eg"],
+    圖片: ["images/15.jpg"]
+  },
+  {
+    作品: "慕夏",
+    學員: "林O希",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "慕夏的經典海報女子：花冠、蓬鬆髮絲、手持畫紙，身後是圓形裝飾框與繁複的花草線條，柔粉與橄欖綠的配色完全是新藝術時期的樣子。用 AI 讓這張百年前的畫動起來，靜止的裝飾線條有了呼吸。",
+    影片: ["coQOsfLDUTE"],
+    圖片: ["images/16.jpg"]
+  },
+  {
+    作品: "AI工具提升辦公效率",
+    學員: "鄧O楊",
+    課程: "生成式AI辦公室應用",
+    年份: "2026",
+    說明: "一份完整的簡報提案，用深藍配霧灰的網頁式版型貫串六頁：封面〈推動數位轉型與 AI 工具提升辦公效率〉以發光機械手指破題，接著〈為何選擇 AI 工具〉引出超過七成企業已導入的現況，〈導入 AI 工具實例分析〉拿一家五百人規模的金融服務業當案例，列出效率提升 30%、錯誤率降低 20% 的成果，再用「需求評估→工具選擇→員工培訓」三張卡片給出落地步驟，最後收在結論行動項目與未來展望。",
+    影片: [],
+    圖片: ["images/17.jpg","images/18.jpg","images/19.jpg","images/20.jpg","images/21.jpg","images/22.jpg"]
+  },
+{
+    作品: "春日花園",
+    學員: "游O敏",
+    課程: "生成式AI辦公室應用",
+    年份: "2026",
+    說明: "咖啡館春季限定的橫幅主視覺，同一套企劃做了兩個版本。主角是杯壁鑲著草莓切片的草莓歐蕾，搭配櫻花造型和菓子與兔子饅頭，背景落在一片櫻花裡。粉色系拿捏得剛好，沒有甜到發膩；三枚圓形圖示把「嚴選草莓／春日和菓子／療癒時光」排得整齊，副標「在每一口香甜中，遇見春天的美好」也寫得有畫面。第二版加了 COFFEE HOUSE 杯身標誌和裝飾外框，完成度更高。",
+    影片: [],
+    圖片: ["images/23.jpg","images/24.jpg"]
+  },
+ {
+    作品: "智慧家電圖",
+    學員: "鄭O琳",
+    課程: "生成式AI辦公室應用",
+    年份: "2026",
+    說明: "新一代 AI 智慧冰箱的產品形象橫幅。四門黑鈦冰箱立在採光極好的現代廚房裡，門上的螢幕顯示著 03°C，左側主標打「懂你的冰箱，更懂你的生活」，下方用兩排圖示交代 AI 智慧管理、精準保鮮、高效節能與快速冷卻、靜音運轉、APP 遠端控制。",
+    影片: [],
+    圖片: ["images/25.jpg"]
+  },
+ {
+    作品: "綠能辦公室",
+    學員: "吳O恩",
+    課程: "生成式AI辦公室應用",
+    年份: "2026",
+    說明: "直式的辦公室佈告欄海報，主題是「節能・減碳・愛地球」。整張圖做成軟木塞板貼滿便條的形式：綠色行動清單、冷氣設定 26–28°C 的節能小知識、6 月 5 日世界環境日公告、辦公室植栽日活動，還有一張「今天的選擇，決定未來的環境」的手寫感標語。",
+    影片: [],
+    圖片: ["images/26.jpg"]
+  },
+  {
+    作品: "夏日冰咖啡",
+    學員: "吳O琪",
+    課程: "生成式AI辦公室應用",
+    年份: "2026",
+    說明: "ChatGPT生成。夏季限定飲品的直式海報：檸檬風味冷萃咖啡配上一塊檸檬戚風蛋糕，擺在海灘木桌上，背景是藍天、棕櫚葉與浪。",
+    影片: [],
+    圖片: ["images/27.jpg"]
+  },
+ {
+    作品: "人體工學椅",
+    學員: "簡O崴",
+    課程: "生成式AI辦公室應用",
+    年份: "2026",
+    說明: "一份完整的產品改版提案：《Ember 2.0 改版啟動簡報》。從 Ember 1.0 上市六個月的成果談起——銷售逾 5,000 張、整體評分 4.2、外型滿意度 4.6，但組裝簡易度只有 3.2；資料來源橫跨 850 份售後問卷、電商評論與客服紀錄。中段拆出三項用戶痛點（腰靠位置固定、扶手 PU 材質水解龜裂、滑輪噪音），對應到 2.0 的四項功能期望（5cm 可調腰靠、TPE 抗水解扶手、靜音萬向輪、選配頭枕），最後收在「舒適度個人化」與「耐用性升級」雙主軸，並把行動項目分派給設計部門與採購製造部門。",
+    影片: [],
+    圖片: ["images/28.jpg","images/29.jpg","images/30.jpg","images/31.jpg","images/32.jpg","images/33.jpg"]
+  },
+  {
+    作品: "慢城市生活美學館",
+    學員: "趙O傑",
+    課程: "生成式AI辦公室應用",
+    年份: "2026",
+    說明: "ChatGPT生成。展覽主視覺。主標「慢下來，世界才開始清晰」壓在一片米白的空間裡，畫面右側是一棵種在圓形花台上的樹，穿過拱形開口望出去是模糊的城市天際線，行人全被處理成長曝光的殘影——動與靜的對比正好就是「慢」的主題。",
+    影片: [],
+    圖片: ["images/34.jpg"]
+  },
+ {
+    作品: "NovaTech",
+    學員: "趙O傑",
+    課程: "生成式AI辦公室應用",
+    年份: "2026",
+    說明: "ChatGPT生成。NovaTech 十週年尾牙年會的主視覺，跟同作者的「慢城市」是完全相反的一極。深藍夜空底，一個由粒子光軌繞成的巨大「10」佔據右半，底下一排剪影人物迎著光走來，城市天際線在光暈裡若隱若現。",
+    影片: [],
+    圖片: ["images/35.jpg"]
+  },
+  {
+    作品: "AI音樂",
+    學員: "黃O勛",
+    課程: "生成式AI能力認證",
+    年份: "2026",
+    說明: "指令設定\n使用[Mezzo-Soprano,Edge,Ethereal,Piercing,Keening,Yodel-like\nglissando,Grit](女中音、邊緣感、空靈感、穿透力、愛爾蘭傳統輓歌\n式唱法、真假音切換、顆粒感）來驅動模型，生成一首另類搖滾結合\n居爾特（Celtic）空靈民謠的反戰歌曲。",
+    影片: ["KQOUYgiv8-M"],
+    圖片: ["images/36.jpg"]
+  },
+ {
+    作品: "疊印",
+    學員: "呂林O佑",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "三張一組的疊印練習。第一張把男子側臉與雪山、雲層疊在一起，背景是同心圓狀的彩虹放射線，加上厚重的顆粒雜訊，整體很有迷幻搖滾海報的味道。第二張是四格人像拼貼，老太太、側臉青年、扮鬼臉的男孩與戴帽的年輕人被框進紅藍花草邊框裡，四種年齡與表情湊成一組。第三張則是玫瑰、蝴蝶與襯線字母 ABC 的半調網點疊印，色彩從青綠過渡到紫紅，紙紋質感做得很足。",
+    影片: [],
+    圖片: ["images/37.jpg","images/38.jpg","images/39.jpg"]
+  },
+ {
+    作品: "無題",
+    學員: "谷O霈",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "紅髮女子抱著一束紅黃鬱金香，花與毛衣的纖維疊進臉部輪廓，暗背景把光線收得很緊。海報〈魚從天降〉用藍、綠、橘三色套印，三尾大魚從天壓向底下的橘紅色城市，副標「無人能逃離的魚之啟示」，底下還壓著一行 APOCALYPSE——荒謬感十足，是三張裡最有主張的一張。第三張是四格自然風景拼貼，粉紅櫻花小徑、苔綠石階、林間小溪與夜空枯枝，配上墨綠底與手繪葉飾，色調安靜。",
+    影片: [],
+    圖片: ["images/40.jpg","images/41.jpg","images/42.jpg"]
+  },
+ {
+    作品: "Olivia's Morning",
+    學員: "劉O廷",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "紫色襯線標題〈OLIVIA'S MORNING〉壓在螢光綠的菊花與橘紅色的鳥上，泛黃紙張質感搭配細碎的內文，很像十九世紀的植物圖鑑被重新套色。另一張〈春／SPEING〉走東方路線，女子側臉剪影裡藏著一整片山水與飛鳥，背景是初春發芽的枝條與暖褐色天空，中英日三種文字沿著邊緣排列。第三張是四隻小貓的照片拼貼，配上藍綠桃粉的剪紙圖形，輕快活潑。",
+    影片: [],
+    圖片: ["images/43.jpg","images/44.jpg","images/45.jpg"]
+  },
+ {
+    作品: "花",
+    學員: "范O鑠",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "橄欖綠底上的一叢桃紅芍藥，花瓣是細膩的植物插畫，但被大筆的顏料潑濺與刮痕覆蓋，右上角還留著一個未閉合的白色框線。",
+    影片: [],
+    圖片: ["images/46.jpg"]
+  },
+ {
+    作品: "無題",
+    學員: "陳O潔",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "薄荷綠底上的一團抽象爆發：橘、藍、白的筆觸與潑墨交錯，隱約能辨出魚鰭或羽毛的形狀，顏料往下流成垂直的痕跡。沒有具體的物件可辨識，純粹靠色彩與筆勢說話。",
+    影片: [],
+    圖片: ["images/47.jpg"]
+  },
+ {
+    作品: "狐狸",
+    學員: "廖O彤",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "粉藍底上的一隻狐狸，全部由短促的筆觸堆成——珊瑚粉、橘、洋紅層層交疊，只在眼睛與鼻尖用了幾筆確定的深色。",
+    影片: [],
+    圖片: ["images/48.jpg"]
+  },
+ {
+    作品: "Bad Roman",
+    學員: "鄭O堯",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "絹印風格的海報：一副紫色胸腔骨架立在畫面中央，上方停著一隻檸檬黃蝴蝶，兩側是綠色的葉片，右緣以暗紅色直排大寫「BAD ROMAN」。骨骼、昆蟲與植物標本的組合是古典博物誌的語彙，配上螢光套色就成了當代的唱片封面感。",
+    影片: [],
+    圖片: ["images/49.jpg"]
+  },
+ {
+    作品: "螃蟹",
+    學員: "楊O儒",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "淺粉紫的龍蝦標本圖疊在螢光綠的茉莉葉上，底部用襯線字排出「JASMINE or JESSAMY」，左上角還有一行細小的手寫引文。",
+    影片: [],
+    圖片: ["images/50.jpg"]
+  },
+ {
+    作品: "青椒",
+    學員: "黃O婷",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "群青藍底上的一株辣椒植物：紅椒、青椒與白色小花的古典植物畫，枝葉間爬著毛蟲、停著飛蛾與蜜蜂。大量白色圓點與潑濺覆蓋在上面，像被雨或光打散。",
+    影片: [],
+    圖片: ["images/51.jpg"]
+  },
+ {
+    作品: "Cute Dog",
+    學員: "Reno",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "亮藍背景裡，一隻巴哥犬裹在厚厚的白色長毛毯裡只露出臉，黃色的襯線標題「A Cute Dog for Happiness」橫過畫面。",
+    影片: [],
+    圖片: ["images/52.jpg"]
+  },
+ {
+    作品: "Veloce",
+    學員: "游O淇",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "捲髮吹風機品牌 VELOCE 的完整識別板：標誌是一縷捲髮化成的線條，主色用深青綠配玫瑰金，標語「Define. Dry. Deliver.」。",
+    影片: [],
+    圖片: ["images/53.jpg"]
+  },
+ {
+    作品: "Route 66 Burger CO.",
+    學員: "鄧O揚",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "美式公路漢堡店的品牌全套設計。招牌用鏽蝕鐵牌加霓虹燈管，主標誌是一枚盾形徽章，中間畫著 1958 年的餐車。紅、奶油、深藍、芥末黃四色貫串到底，延伸出紙袋、飲料杯、餐盤、菜單夾、T恤、圍裙、杯墊與鑰匙圈。",
+    影片: [],
+    圖片: ["images/54.jpg"]
+  },
+ {
+    作品: "毛日常",
+    學員: "張O菁",
+    課程: "AI廣告設計",
+    年份: "2026",
+    說明: "寵物零食品牌的 CIS 設計圖，一張圖交代了完整的識別系統。標誌是一隻狗和一隻貓從招牌後探出頭，標語「寵物零食・好吃不貴」，理念寫「小預算，大幸福」。色彩計畫走暖棕奶油色系，應用延伸到三款包裝（雞肉條、鴨肉丁、鮭魚片）、名片信封、店面招牌、帆布袋與寵物碗。",
+    影片: [],
+    圖片: ["images/55.jpg"]
+  },
+ {
+    作品: "Happy Valentine's Day",
+    學員: "卓O",
+    課程: "AI形象設計",
+    年份: "2026",
+    說明: "深紅底的情人節海報，兩顆重疊的愛心浮在上方，下半部用透視延伸的字堆疊出立體感，中間引了莎士比亞十四行詩的句子，底部收在一行「No words are necessary between two loving hearts.」。",
+    影片: [],
+    圖片: ["images/56.jpg"]
+  },
+ {
+    作品: "Moto",
+    學員: "林O新",
+    課程: "AI形象設計",
+    年份: "2026",
+    說明: "復古風格的機車巡遊聚會海報。米色底配放射線，中央是一台重機的剪影，上方紅色緞帶寫著「邀請您加入我們的盛大活動！」，下方標出日期與集合地點。",
+    影片: [],
+    圖片: ["images/57.jpg"]
+  },
+ {
+    作品: "花磚",
+    學員: "林O穎",
+    課程: "AI形象設計",
+    年份: "2026",
+    說明: "台灣老花磚的圖樣設計。四乘四共十六格的連續紋樣，用淡紫、橘與白三色重組傳統的幾何花卉，下方以紫色標題「台灣花磚 / TAIWAN OLD TILES」收尾。",
+    影片: [],
+    圖片: ["images/58.jpg"]
+  },
+   {
+    作品: "一盞青",
+    學員: "魏O",
+    課程: "AI形象設計",
+    年份: "2026",
+    說明: "台灣茶品牌的識別與應用。標誌把一只蓋碗、一片茶葉與圓形收在一起，標語「台灣茶 × 現代生活 / A CUP OF TEA, A MOMENT OF YOU」，還蓋了一枚紅色印章。名片用米白紙配墨綠字，質感克制；另一張是電商頁面，主推「古霧鐵觀音」，下方排出四款茶品與定價。",
+    影片: [],
+    圖片: ["images/59.jpg","images/60.jpg"]
+  },
+  {
+    作品: "半日甜",
+    學員: "鄺O萍",
+    課程: "AI形象設計",
+    年份: "2026",
+    說明: "甜點咖啡店的識別。標誌是一塊蛋糕配一只咖啡杯，上方冒出一株嫩芽，標語「把美甜・留在半日的時光」。名片正反面都用奶油色配深褐線條，乾淨俐落。第二張是「一口甜・一口咖啡」的宣傳海報，用單線插畫把蛋糕、可頌、摩卡壺與咖啡豆懸浮在托盤上方，下方列出品項。",
+    影片: [],
+    圖片: ["images/61.jpg","images/62.jpg"]
+  },
+  {
+    作品: "植感窩",
+    學員: "陳O仁",
+    課程: "AI形象設計",
+    年份: "2026",
+    說明: "植栽生活品牌的識別提案。標誌由「鏟子＋土壤＋葉片」三個元素組合而成，色彩以苔綠為主，搭配 30／60／10 的配色比例圖、標誌製圖網格與名片模擬。",
+    影片: [],
+    圖片: ["images/63.jpg"]
+  },
+  {
+    作品: "好臨居",
+    學員: "陳O瑜",
+    課程: "AI形象設計",
+    年份: "2026",
+    說明: "青年旅館的識別設計。標誌把「GOOD」的字母結構和房屋的山牆輪廓合成一個圖形，配色走暖褐與奶茶色。",
+    影片: [],
+    圖片: ["images/64.jpg"]
+  },
+  {
+    作品: "珠語",
+    學員: "魏O旭",
+    課程: "AI形象設計",
+    年份: "2026",
+    說明: "手作串珠飾品品牌的識別。標誌是「S」與「J」兩個字母交纏成的手寫花體，綴上金色的珠點，英文名 Bejeweled。深藍配米白與金的三色比例，延伸到名片與店面展示。",
+    影片: [],
+    圖片: ["images/65.jpg"]
+  },
+  {
+    作品: "角落的收藏室",
+    學員: "楊O芸",
+    課程: "AI形象設計",
+    年份: "2026",
+    說明: "一隻抱著書的狐狸走在藏書室的木地板上，兩側書架高聳、藤蔓垂落，成排的提燈亮著暖光，盡頭是一扇雕花圓窗，牆上掛著一整面金框畫作。",
+    影片: [],
+    圖片: ["images/66.jpg"]
+  },
+  {
+    作品: "澄序茶所",
+    學員: "郭O芳",
+    課程: "AI形象設計",
+    年份: "2026",
+    說明: "茶飲品牌的杯身與菜單應用。三款杯子分別是墨綠、米白與深褐，燙金標誌是一個把山形與茶湯收進圓框的圖形。右側立牌列出八款茶品與價格，底下寫著「是一杯茶葉茶，澄澄心，找回序」。",
+    影片: [],
+    圖片: ["images/67.jpg"]
+  },
+  {
+    作品: "芭蕾舞",
+    學員: "董O翎",
+    課程: "視覺行銷實作",
+    年份: "2026",
+    說明: "粉灰雙色的拼貼海報。五張芭蕾舞者的照片被裁進圓形與拱形的區塊裡，全部壓成粉紅與灰階的雙色調，大字「舞者 / Ballet」斜壓在畫面上方，直排的副標寫「踮起腳尖，便是一生浪漫的開始」。",
+    影片: ["eW74OxaJNDs"],
+    圖片: ["images/68.jpg"]
+  },
+  {
+    作品: "Vacation",
+    學員: "董O翎",
+    課程: "視覺行銷實作",
+    年份: "2026",
+    說明: "度假主題的拼貼。海鷗、沙灘吊椅、日落海面與低頭看見自己踩在沙上的照片，用白色細框層層錯落地疊起來，背景鋪了報紙質感與「love」字樣的紙張。標題「VACATION」配上「saltwater heals everything」，是很典型的雜誌剪貼風。",
+    影片: ["DUVTM_ndDvA"],
+    圖片: ["images/69.jpg"]
+  },
+  {
+    作品: "台北大橋 音樂祭",
+    學員: "楊O原",
+    課程: "視覺行銷實作",
+    年份: "2026",
+    說明: "同一份活動海報的三個配色提案，版面完全一致：左側直排大字「20 / 26 / bridge」，右上角是「音樂祭」方框，中央的主視覺是一個巨大的數字 3。第一版用藍黃色的毛絨質感，最跳；第二版改成深咖啡底配紫金漸層的等高線，最沉穩；第三版是紫橘的絲線網格，介於兩者之間。",
+    影片: [],
+    圖片: ["images/70.jpg","images/71.jpg","images/72.jpg"]
+  },
+{
+    作品: "拾墨文創",
+    學員: "張O欣",
+    課程: "視覺行銷實作",
+    年份: "2026",
+    說明: "個人工作室的品牌與作品合輯。標誌把黃色的「10」與一圈墨痕結合，中間壓上灰藍色的「拾墨」二字，英文名 SHIMO Creative Studio，延伸到名片與紙袋（紙袋還特別配了桃紅色提繩）。另外三張是展示圖：荔枝的水果廣告，粉色卷雲底紋配上「一口咬下，爆汁的甜蜜在舌尖綻放」，做了候車亭燈箱、掛牆海報與網頁三種情境模擬；旁邊那張法拉利車展海報則走郵票造型，暗紅鋸齒邊框配放射線，標語「引擎轟鳴，喚醒你的感官極限」。",
+    影片: [],
+    圖片: ["images/73.jpg","images/74.jpg","images/75.jpg","images/76.jpg","images/77.jpg"]
+  },
+ {
+    作品: "翔硯設計",
+    學員: "高O",
+    課程: "視覺行銷實作",
+    年份: "2026",
+    說明: "印刷設計公司的識別系統。標誌把「翔」與「硯」兩個字拆解重組，加上一道閃電般的斜線，配色是深藍與銀灰。正反雙面名片、店面壓克力招牌、紙張材質型錄（內頁是「紙張材質總覽」與「為您的產品打造最佳包裝體驗」兩個跨頁），以及員工識別證吊帶。名片下緣列出「名片・廣告・招牌・彩盒」，業務範圍一目了然。",
+    影片: [],
+    圖片: ["images/78.jpg","images/79.jpg","images/80.jpg","images/81.jpg"]
+  },
+  {
+    作品: "Green Garden Coffee",
+    學員: "王O珍",
+    課程: "視覺行銷實作",
+    年份: "2026",
+    說明: "咖啡品牌的 CIS 品牌識別手冊，取了其中五頁。標誌是一只冒著熱氣的咖啡杯，左側環抱著枝葉與白花，搭配 Green Garden Coffee 的花體英文，標準色訂為深墨綠（C91 M57 Y71 K21）。手冊依序交代標準色規範、名片格式（含正反面與模擬示意，背面還印上完整菜單）、圍裙、圓形側掛招牌與帆布袋。",
+    影片: [],
+    圖片: ["images/82.jpg","images/83.jpg","images/84.jpg","images/85.jpg","images/86.jpg"]
+  },
+{
+    作品: "Can",
+    學員: "陳O潔 鄭O堯 陳O羽",
+    課程: "視覺行銷實作",
+    年份: "2026",
+    說明: "三人的罐頭包裝系列，三罐各一種風格。「Pineapple Slices in 100% Juice」用米白底鋪滿藍、橘、粉、綠的鳳梨與果片版畫，套色鮮亮；「LOBSTER & CRAB」用泛黃牛皮底配黑色龍蝦與螃蟹的銅版畫，紅藍雙色標題，最有老雜貨鋪的味道；第三罐走蜂蜜主題，明黃底上是橘紅的蜂巢與花草。三罐都建立在同一套古典博物插畫＋螢光套色的語言上。",
+    影片: [],
+    圖片: ["images/87.jpg","images/88.jpg","images/89.jpg"]
+  },
+ {
+    作品: "素人改造",
+    學員: "鍾O云",
+    課程: "AI短影音",
+    年份: "2026",
+    說明: "素人改造的前後對比短影音，用轉場的節奏放大改變帶來的驚喜感。",
+    影片: ["l1aECO39eLU"],
+    圖片: ["images/90.jpg"]
+  },
+  {
+    作品: "有你陪伴真好",
+    學員: "王O絃",
+    課程: "AI短影音",
+    年份: "2026",
+    說明: "用最日常的一個瞬間承載「陪伴」這個主題。",
+    影片: ["njBf8HWgiNA"],
+    圖片: ["images/91.jpg"]
+  },
+ {
+    作品: "美女與野獸",
+    學員: "黃O娘",
+    課程: "AI短影音",
+    年份: "2026",
+    說明: "取材自經典童話的短影音改編。",
+    影片: ["-ZS_yBB3AKg"],
+    圖片: ["images/92.jpg"]
+  },
+ {
+    作品: "貓狗合集",
+    學員: "于O穎",
+    課程: "AI短影音",
+    年份: "2026",
+    說明: "貓狗片段的合集短影音。",
+    影片: ["QUZkSiiN2QE"],
+    圖片: ["images/93.jpg"]
+  },
+  {
+    作品: "老鼠抓貓",
+    學員: "巫O汶",
+    課程: "AI短影音",
+    年份: "2026",
+    說明: "3D 遊戲風格的畫面：一隻頭頂蘑菇的小貓在草地平台上，被一隻裹著黑斗篷的小老鼠追著跑。",
+    影片: ["MBt3RjCzSYU"],
+    圖片: ["images/94.jpg"]
+  },
+  {
+    作品: "逗貓貓",
+    學員: "王O傑",
+    課程: "AI短影音",
+    年份: "2026",
+    說明: "逗貓的日常短影音。",
+    影片: ["MfoFJgpnEdE"],
+    圖片: ["images/95.jpg"]
+  },
+  {
+    作品: "兔子咬焦糖布丁",
+    學員: "陳O玲",
+    課程: "AI短影音",
+    年份: "2026",
+    說明: "兔子啃焦糖布丁的萌系短影音。",
+    影片: ["xehFOQGK7SA"],
+    圖片: ["images/96.jpg"]
+  },
+ {
+    作品: "香蕉磅蛋糕",
+    學員: "林O",
+    課程: "AI短影音",
+    年份: "2026",
+    說明: "香蕉磅蛋糕的美食短影音，從備料到出爐，用食物的質感變化鋪陳整段節奏。",
+    影片: ["ED-UQSVqrcs"],
+    圖片: ["images/97.jpg"]
+  },
+];
+
+/* ========================================================================== */
+
+const 色盤 = ["#2E4A62","#5B4B7A","#7A4A3C","#2F5D4E","#8A5A2B","#40485C","#6B3F52","#3C5A4A"];
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function 影片ID(u){
+  if(!u) return "";
+  const m = String(u).match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(u) ? u : "");
+}
+function 底圖(text,seed){
+  const c = 色盤[Math.abs([...String(seed)].reduce((a,ch)=>a+ch.charCodeAt(0),0)) % 色盤.length];
+  return `<div class="ph" style="background:${c}">${esc(text)}</div>`;
+}
+function 縮圖(w,i=0,cls=""){
+  const src = w.圖片 && w.圖片[i];
+  if(!src) return 底圖(w.作品, w.作品);
+  return `<img class="${cls}" src="${esc(src)}" alt="${esc(w.作品)}" loading="lazy"
+    data-ph="${esc(w.作品)}" onerror="圖失敗(this)">`;
+}
+window.圖失敗 = function(img){
+  const t = img.getAttribute("data-ph") || "";
+  img.outerHTML = 底圖(t, t);
+};
+
+function 投影片(w){
+  const s = (w.圖片||[]).filter(Boolean).map(src=>({型:"圖", 值:src}));
+  const vs = Array.isArray(w.影片) ? w.影片 : (w.影片 ? [w.影片] : []);
+  vs.map(影片ID).filter(Boolean).forEach(v=>s.push({型:"影", 值:v}));
+  return s;
+}
+function 有影片(w){ return 投影片(w).some(s=>s.型==="影"); }
+function 封面(w,cls=""){
+  const 首 = (w.圖片||[]).filter(Boolean)[0];
+  if(首) return 縮圖(w,0,cls);
+  const v = 投影片(w).find(s=>s.型==="影");
+  if(v) return `<img class="${cls}" src="https://i.ytimg.com/vi/${v.值}/hqdefault.jpg" alt="${esc(w.作品)}" loading="lazy" data-ph="${esc(w.作品)}" onerror="圖失敗(this)">`;
+  return 底圖(w.作品, w.作品);
+}
+
+/* ---------- 首頁 ---------- */
+let 目前課程 = "全部";
+
+let 牆源 = [], 牆指標 = [0,1,2], 牆輪 = 0, 牆計時 = null;
+
+function 換格(k, w){
+  const fig = $("#wall").children[k]; if(!fig) return;
+  const slot = fig.querySelector(".slot"), cap = fig.querySelector("figcaption");
+  const tmp = document.createElement("div");
+  tmp.innerHTML = 封面(w);
+  const el = tmp.firstElementChild; if(!el) return;
+  slot.appendChild(el);
+  requestAnimationFrame(()=>{
+    [...slot.children].forEach(n=>{ if(n!==el) n.classList.remove("live"); });
+    el.classList.add("live");
+    cap.style.opacity = "0";
+    setTimeout(()=>{
+      cap.textContent = `${w.學員||""}　${w.作品||""}`;
+      cap.style.opacity = "";
+    }, 340);
+  });
+  setTimeout(()=>{ [...slot.children].forEach(n=>{ if(n!==el) n.remove(); }); }, 1100);
+}
+
+function 輪播(){
+  clearInterval(牆計時);
+  if(牆源.length <= 3) return;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  牆計時 = setInterval(()=>{
+    if(document.hidden || 現作品) return;
+    const k = 牆輪++ % 3;
+    let n = (牆指標[k] + 3) % 牆源.length, 保險 = 0;
+    while(牆指標.includes(n) && 保險++ < 牆源.length) n = (n+1) % 牆源.length;
+    牆指標[k] = n;
+    換格(k, 牆源[n]);
+  }, 5200);
+}
+
+function 畫牆(){
+  牆源 = 作品資料.length ? 作品資料
+    : [{作品:"第一件作品",圖片:[],學員:"　"},{作品:"第二件作品",圖片:[],學員:"　"},{作品:"第三件作品",圖片:[],學員:"　"}];
+  牆指標 = [0,1,2].map(i => i % 牆源.length);
+  $("#wall").innerHTML = 牆指標.map(()=>
+    `<figure><span class="pin"></span><div class="slot"></div><figcaption></figcaption></figure>`
+  ).join("");
+  牆指標.forEach((i,k)=> 換格(k, 牆源[i]));
+  輪播();
+}
+
+function 畫統計(){
+  const 課程數 = new Set(作品資料.map(w=>w.課程)).size;
+  const 影片數 = 作品資料.filter(有影片).length;
+  $("#tally").innerHTML =
+    `<span>收錄 <b>${作品資料.length}</b> 件作品</span>
+     <span>涵蓋 <b>${課程數}</b> 個課程</span>
+     <span><b>${影片數}</b> 件附成果影片</span>`;
+}
+function 畫篩選(){
+  const 課程 = ["全部", ...new Set(作品資料.map(w=>w.課程))];
+  $("#filters").innerHTML = 課程.map(c=>{
+    const n = c==="全部" ? 作品資料.length : 作品資料.filter(w=>w.課程===c).length;
+    return `<button class="chip" aria-pressed="${c===目前課程}" data-c="${esc(c)}">${esc(c)}<small>${n}</small></button>`;
+  }).join("");
+}
+function 畫網格(){
+  const 清單 = 目前課程==="全部" ? 作品資料 : 作品資料.filter(w=>w.課程===目前課程);
+  if(!清單.length){
+    $("#grid").innerHTML = 作品資料.length
+      ? `<div class="empty"><b>這個課程還沒有作品</b>換一個課程看看。</div>`
+      : `<div class="empty"><b>還沒有作品</b>在網址後面加上 #edit 打開表單，新增第一件作品。</div>`;
+    return;
+  }
+  $("#grid").innerHTML = 清單.map(w=>{
+    const idx = 作品資料.indexOf(w);
+    const 有片 = 有影片(w);
+    return `<button class="card" data-i="${idx}">
+      <div class="thumb">
+        ${封面(w)}
+        ${有片?`<span class="play" title="直接播放影片">▶ 影片</span>`:""}
+      </div>
+      <div class="card-body">
+        <h3>${esc(w.作品)}</h3>
+        <div class="who"><b>${esc(w.學員)}</b>　${esc(w.年份||"")}</div>
+        ${w.說明?`<p class="snip">${esc(w.說明)}</p>`:""}
+      </div>
+    </button>`;
+  }).join("");
+}
+
+$("#filters").addEventListener("click",e=>{
+  const b = e.target.closest(".chip"); if(!b) return;
+  目前課程 = b.dataset.c; 畫篩選(); 畫網格();
+});
+$("#grid").addEventListener("click",e=>{
+  const c = e.target.closest(".card"); if(!c) return;
+  const i = +c.dataset.i;
+  if(e.target.closest(".play")){
+    const k = 投影片(作品資料[i]).findIndex(s=>s.型==="影");
+    開啟(i, k<0 ? 0 : k);
+  } else {
+    開啟(i);
+  }
+});
+
+/* ---------- 詳細頁 ---------- */
+let 現作品 = null, 現片 = [], 現頁 = 0, 回焦點 = null;
+
+function 開啟(i, 起始=0){
+  現作品 = 作品資料[i];
+  現片 = 投影片(現作品);
+  現頁 = Math.max(0, Math.min(起始, 現片.length-1));
+  回焦點 = document.activeElement;
+  $("#veil").classList.add("on");
+  document.body.classList.add("locked");
+  畫面板(); 畫舞台();
+  $("#shut").focus();
+}
+function 關閉(){
+  $("#veil").classList.remove("on");
+  document.body.classList.remove("locked");
+  $("#shot-slot").innerHTML = "";
+  現作品 = null; 現片 = [];
+  if(回焦點) 回焦點.focus();
+}
+function 畫舞台(){
+  const w = 現作品, n = 現片.length, s = 現片[現頁];
+  $("#shot-slot").innerHTML = !s ? 底圖(w.作品, w.作品)
+    : s.型==="圖"
+      ? 縮圖(w, 現頁, "shot")
+      : `<button class="tube" data-v="${s.值}">
+           <img src="https://i.ytimg.com/vi/${s.值}/hqdefault.jpg" alt="">
+           <span class="btn">▶ 播放影片</span>
+         </button>`;
+  const 多 = n > 1;
+  $("#prev").disabled = 現頁<=0;
+  $("#next").disabled = 現頁>=n-1;
+  $("#prev").style.visibility = 多?"visible":"hidden";
+  $("#next").style.visibility = 多?"visible":"hidden";
+  $("#counter").textContent = 多 ? `${現頁+1} / ${n}` : "";
+  $("#strip").innerHTML = 多 ? 現片.map((t,k)=>{
+    const 內 = t.型==="圖"
+      ? 縮圖(w,k)
+      : `<img src="https://i.ytimg.com/vi/${t.值}/hqdefault.jpg" alt="">`;
+    return `<button data-k="${k}" aria-current="${k===現頁}" aria-label="第 ${k+1} 項">
+      ${內}${t.型==="影"?'<span class="vmark">▶</span>':''}</button>`;
+  }).join("") : "";
+}
+function 畫面板(){
+  const w = 現作品;
+  $("#panel").innerHTML = `
+    <span class="tag">${esc(w.課程)}</span>
+    <h2>${esc(w.作品)}</h2>
+    <p class="who"><b>${esc(w.學員)}</b>　${esc(w.年份||"")}</p>
+    ${w.說明?`<p class="desc">${esc(w.說明)}</p>`:""}`;
+}
+function 翻(d){
+  const t = 現頁 + d;
+  if(t<0 || t>=現片.length) return;
+  現頁 = t; 畫舞台();
+}
+
+$("#solo").onclick = ()=>{
+  const on = $("#veil").classList.toggle("focusmode");
+  $("#solo").textContent = on ? "⤡ 展開文案" : "⤢ 收合文案";
+};
+$("#prev").onclick = ()=>翻(-1);
+$("#next").onclick = ()=>翻(1);
+$("#shut").onclick = 關閉;
+$("#strip").addEventListener("click",e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  現頁 = +b.dataset.k; 畫舞台();
+});
+$("#shot-slot").addEventListener("click",e=>{
+  const t = e.target.closest(".tube"); if(!t) return;
+  t.outerHTML = `<iframe class="shot-video" src="https://www.youtube.com/embed/${t.dataset.v}?autoplay=1&rel=0"
+    allow="accelerometer;autoplay;clipboard-write;encrypted-media;picture-in-picture" allowfullscreen></iframe>`;
+});
+$("#veil").addEventListener("click",e=>{ if(e.target.id==="veil") 關閉(); });
+document.addEventListener("keydown",e=>{
+  if(!現作品) return;
+  if(e.key==="Escape") 關閉();
+  if(e.key==="ArrowLeft") 翻(-1);
+  if(e.key==="ArrowRight") 翻(1);
+});
+let x0=null;
+$(".stage").addEventListener("touchstart",e=>{x0=e.touches[0].clientX},{passive:true});
+$(".stage").addEventListener("touchend",e=>{
+  if(x0===null) return;
+  const dx = e.changedTouches[0].clientX - x0;
+  if(Math.abs(dx)>44) 翻(dx<0?1:-1);
+  x0=null;
+},{passive:true});
+
+/* ---------- 新增作品表單 ---------- */
+function 檢查編輯模式(){
+  $("#admin").classList.toggle("on", location.hash==="#edit");
+}
+window.addEventListener("hashchange",檢查編輯模式);
+檢查編輯模式();
+
+$("#gen").onclick = ()=>{
+  const v = id => $("#"+id).value.trim();
+  const 圖 = v("f-imgs").split("\n").map(s=>s.trim()).filter(Boolean);
+  const q = s => JSON.stringify(s);
+  const code =
+`  {
+    作品: ${q(v("f-title")||"未命名作品")},
+    學員: ${q(v("f-name"))},
+    課程: ${q(v("f-course")||"其他")},
+    年份: ${q(v("f-year"))},
+    說明: ${q(v("f-desc"))},
+    影片: [${v("f-video").split("\n").map(s=>影片ID(s.trim())).filter(Boolean).map(q).join(",")}],
+    圖片: [${圖.map(q).join(",")}]
+  },`;
+  const out = $("#out");
+  out.textContent = code;
+  out.classList.add("on");
+  navigator.clipboard?.writeText(code).catch(()=>{});
+  out.scrollIntoView({behavior:"smooth",block:"nearest"});
+};
+
+畫牆(); 畫統計(); 畫篩選(); 畫網格();
+</script>
+</body>
+</html>
